@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"os/signal"
 	"takoworld-bot/model/envconfig"
 	"takoworld-bot/model/player"
@@ -68,6 +69,10 @@ var (
 		{
 			Name:        "shutdown",
 			Description: "Shutdown the TAKO WORLD Server after 60s.",
+		},
+		{
+			Name:        "show-memory",
+			Description: "Show the memory usage.",
 		},
 	}
 
@@ -184,6 +189,19 @@ var (
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: response,
+				},
+			})
+		},
+		"show-memory": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			response, err := exec.Command("free", "-h").Output()
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: string(response),
 				},
 			})
 		},

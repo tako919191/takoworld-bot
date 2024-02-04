@@ -27,6 +27,7 @@ clean:
 
 .PHONY: cross-build
 cross-build:
+	go mod vendor
 	for os in darwin linux; do \
 		for arch in amd64 arm64; do \
 			GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME); \
