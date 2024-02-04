@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"takoworld-bot/model/envconfig"
+	"takoworld-bot/model/player"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gorcon/rcon"
@@ -109,10 +111,39 @@ var (
 				log.Fatal(err)
 			}
 
+			// CSV 形式で返ってくるのでパース処理
+			players, err := player.ParseCSVToPlayers(response)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			names := ""
+			for i, p := range players {
+				if i != 0 {
+					names += ", "
+				}
+				names += p.Name
+			}
+
+			format := "%s %s %s\n"
+			emoji := "🦖"
+			title := fmt.Sprintf(format, emoji, "ログイン中のおたくたち", emoji)
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: response,
+					Embeds: []*discordgo.MessageEmbed{
+						{
+							Title: title,
+							Color: 0x00ff00, // Green
+							Fields: []*discordgo.MessageEmbedField{
+								{
+									Name:  "Name",
+									Value: names,
+								},
+							},
+						},
+					},
+					AllowedMentions: &discordgo.MessageAllowedMentions{},
 				},
 			})
 		},

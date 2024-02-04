@@ -1,4 +1,7 @@
 .env
+bin/
+vendor/
+dist/
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,go
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,go
