@@ -2,7 +2,7 @@
 # Values
 ## ---------------------------------------------------------------------- ##
 NAME     := takoworld-bot
-VERSION  := v0.1.1
+VERSION  := v0.1.2
 REVISION := $(shell git rev-parse --short HEAD)
 
 SRCS    := $(shell find . -type f -name '*.go')

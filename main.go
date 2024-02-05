@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"takoworld-bot/model/envconfig"
+	"takoworld-bot/model/memory"
 	"takoworld-bot/model/player"
 
 	"github.com/bwmarrin/discordgo"
@@ -130,9 +131,7 @@ var (
 				names += p.Name
 			}
 
-			format := "%s %s %s\n"
-			emoji := "🦖"
-			title := fmt.Sprintf(format, emoji, "ログイン中のおたくたち", emoji)
+			title := fmt.Sprintf("%s %s %s\n", "🦖", "ログイン中のおたくたち", "🦖")
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
@@ -198,10 +197,32 @@ var (
 				log.Fatal(err)
 			}
 
+			// free コマンドの実行結果をパースする
+			memory, err := memory.ParseFreeCommandResultToMemory(string(response))
+			if err != nil {
+				log.Fatal(err)
+			}
+
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: string(response),
+					Embeds: []*discordgo.MessageEmbed{
+						{
+							Title: fmt.Sprintf("%s %s %s\n", "🖥️", "現在のサーバーのメモリ状況", "🖥️"),
+							Color: 0xff7f50, // Coral
+							Fields: []*discordgo.MessageEmbedField{
+								{
+									Name:  fmt.Sprintf("%s %s\n", "🐶", "メモリ"),
+									Value: fmt.Sprintf("%s %s %s\n", memory[0].Usage, "/", memory[0].Total),
+								},
+								{
+									Name:  fmt.Sprintf("%s %s\n", "🐱", "スワップ"),
+									Value: fmt.Sprintf("%s %s %s\n", memory[1].Usage, "/", memory[1].Total),
+								},
+							},
+						},
+					},
+					AllowedMentions: &discordgo.MessageAllowedMentions{},
 				},
 			})
 		},
